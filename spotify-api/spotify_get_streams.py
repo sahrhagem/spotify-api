@@ -3,10 +3,7 @@ import json
 from datetime import datetime, timedelta
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth, SpotifyClientCredentials
-from sqlalchemy import create_engine, Table, Column, String, MetaData, TIMESTAMP
-from sqlalchemy.dialects.postgresql import insert
 import pandas as pd
-
 import os
 
 
