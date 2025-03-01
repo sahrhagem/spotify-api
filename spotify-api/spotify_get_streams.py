@@ -5,6 +5,11 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth, SpotifyClientCredentials
 import pandas as pd
 import os
+from dotenv import load_dotenv
+import requests
+
+# Load environment variables
+load_dotenv()
 
 
 class EnvNotSet(Exception):
@@ -24,7 +29,7 @@ if SPOTIPY_CLIENT_SECRET is None:
 SPOTIPY_REDIRECT_URI = os.getenv("SPOTIPY_REDIRECT_URI")
 if SPOTIPY_CLIENT_SECRET is None:
     raise EnvNotSet("SPOTIPY_REDIRECT_URI")
-
+TELEGRAM_REST_ENDPOINT = os.getenv("TELEGRAM_REST_ENDPOINT")
 
 
 
@@ -121,14 +126,25 @@ def update_csv_with_new_entries():
     
     # Identify new entries by comparing the "Played At" column
     new_entries_df = new_data_df[~new_data_df["played_at"].isin(existing_df["played_at"])]
-    
+
+    n = len(new_entries_df)
+
     if not new_entries_df.empty:
         # Append new entries to the existing CSV
         new_entries_df.to_csv(CSV_FILE, mode='a', header=False, index=False, sep=";")
-        print(f"Added {len(new_entries_df)} new entries to the CSV.")
+        print(f"Added {n} new entries to the CSV.")
     else:
         print("No new entries to add.")
 
+    try: 
+        url = f"{TELEGRAM_REST_ENDPOINT}/log"
+        myobj = {'message': f"Spotify: {n} new entries"}
+
+        x = requests.post(url, json = myobj)
+
+        print(x.text)    
+    except Exception as e:
+        print(e)
 update_csv_with_new_entries()
 
 
